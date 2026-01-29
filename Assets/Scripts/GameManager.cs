@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
-
+using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public Tile[,] Tiles
@@ -39,6 +38,47 @@ public class GameManager : MonoBehaviour
 
         // Randomly assign the current player between the user and the AI.
         SwitchPlayer(UnityEngine.Random.Range(0, 2) == 0 ? User.Player : User.AI);
+
+
+        if (CurrentPlayer == User.Player)
+        {
+            PlayerTurnStart();
+        }
+        else if (CurrentPlayer == User.AI)
+        {
+            AITurn();
+        }
+    }
+
+    public void PlayerTurnStart()
+    {
+        TilesInteractionaStatusEvent?.Invoke(true);
+    }
+
+    public void AITurn()
+    {
+        TilesInteractionaStatusEvent?.Invoke(false);
+
+        // Loop through the valid tiles that the AI can make a play on.
+        List<Tile> validTiles = new List<Tile>();
+
+        for (int i = 0; i < Tiles.GetLongLength(0); i++)
+        {
+            for (int j = 0; j < Tiles.GetLength(1); j++)
+            {
+                Tile currentTile = Tiles[i, j];
+
+                if (currentTile.TileOwner == User.None)
+                {
+                    validTiles.Add(currentTile);
+                }
+            }
+        }
+
+        int randomValidTileIndex = UnityEngine.Random.Range(0, validTiles.Count);
+
+        // End the turn after the AI makes a move.
+        validTiles[randomValidTileIndex].AIClickEvent();
     }
 
     private Tile[,] GenerateTiles(int width = 3, int length = 3, float spacing = 1)
@@ -72,15 +112,69 @@ public class GameManager : MonoBehaviour
     public void EndTurn()
     {
         // Check if the current player has the condition to win, if win, run win method and return, else continue.
-        Debug.Log("End of turn, checking win condition.");
+        if (CheckWin())
+        {
+            Win(CurrentPlayer);
+            return;
+        }
 
         // Check if there are spaces for future moves - if not, run draw method and return, else continue
-        Debug.Log("No win found, checking for spaces.");
+        if (NoSpacesAvailable())
+        {
+            Debug.Log("No Space Available.");
+            Draw();
+            return;
+        }
 
         // Switch the current player to the opponent.
         Debug.Log("Future play possible, switching current player.");
-
         SwitchPlayer();
+
+        // Start the turn of the new current player.
+        if (CurrentPlayer == User.Player)
+        {
+            PlayerTurnStart();
+        }
+        else if (CurrentPlayer == User.AI)
+        {
+            AITurn();
+        }
+    }
+
+    public bool CheckWin()
+    {
+        Debug.Log("End of turn, checking win condition.");
+        return false;
+    }
+
+    public void Win(User winner)
+    {
+        Debug.Log($"Winner is: {winner}");
+        TilesInteractionaStatusEvent?.Invoke(false);
+    }
+
+    public void Draw()
+    {
+        Debug.Log("Draw Game due to no play space and no victory for either player.");
+        TilesInteractionaStatusEvent?.Invoke(false);
+    }
+
+    public bool NoSpacesAvailable()
+    {
+        Debug.Log("No win found, checking for spaces.");
+
+        bool isNoSpaceAvailable = true;
+
+        foreach (Tile tile in Tiles)
+        {
+            if (tile.TileOwner == User.None)
+            {
+                isNoSpaceAvailable = false;
+                break;
+            }
+        }
+
+        return isNoSpaceAvailable;
     }
 
     /// <summary>
@@ -97,7 +191,7 @@ public class GameManager : MonoBehaviour
     /// <param name="newPlayer"></param>
     public void SwitchPlayer(User newPlayer)
     {
-
+        CurrentPlayer = newPlayer;
     }
 }
 

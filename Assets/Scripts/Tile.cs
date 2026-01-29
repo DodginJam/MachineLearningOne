@@ -14,7 +14,6 @@ public class Tile : MonoBehaviour
     public TextMeshProUGUI TextDisplay
     { get; private set; }
 
-    [field: SerializeField]
     public User TileOwner
     { get; private set; } = User.None;
 
@@ -46,7 +45,7 @@ public class Tile : MonoBehaviour
 
     void PlayerClickEvent()
     {
-        if (IsInteractable)
+        if (IsInteractable && TileOwner == User.None)
         {
             SetTileOwner(User.Player);
 
@@ -54,7 +53,7 @@ public class Tile : MonoBehaviour
         }
     }
 
-    void AIClickEvent()
+    public void AIClickEvent()
     {
         SetTileOwner(User.AI);
 
