@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
                 // Grab the reference to the tile script component.
                 if (newTile.TryGetComponent<Tile>(out Tile tile))
                 {
-                    tiles[i, j] = tile;
+                    tiles[j, i] = tile;
                     TilesInteractionaStatusEvent += tile.SetInteractableState;
                     tile.OnClick += EndTurn;
                 }
@@ -143,8 +143,44 @@ public class GameManager : MonoBehaviour
 
     public bool CheckWin()
     {
+        int currentRow = 0;
+        int rowIndex = 0;
+
+        int currentColumn = 0;
+        int columnIndex = 0;
+
+        bool searchComplete = false;
+        bool winFound = false;
+
+        User winnerOwner = User.None;
+
+        // Checking the rows for a complete seqeunce of ownership of tiles.
+        while (currentRow < Tiles.GetLength(0) && searchComplete == false)
+        {
+            Debug.Log($"Row: {currentRow}, Index: {rowIndex}");
+            rowIndex++;
+
+            if (rowIndex >= Tiles.GetLength(1))
+            {
+                currentRow++;
+                rowIndex = 0;
+            }
+        }
+
+        while (currentColumn < Tiles.GetLength(1) && searchComplete == false)
+        {
+            Debug.Log($"Column: {currentColumn}, Index: {columnIndex}");
+            columnIndex++;
+
+            if (columnIndex >= Tiles.GetLength(0))
+            {
+                currentColumn++;
+                columnIndex = 0;
+            }
+        }
+
         Debug.Log("End of turn, checking win condition.");
-        return false;
+        return winFound;
     }
 
     public void Win(User winner)

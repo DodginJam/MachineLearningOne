@@ -48,3 +48,4 @@ MonoBehaviour:
   <Length>k__BackingField: 3
   <Spacing>k__BackingField: 1
   <TilePrefab>k__BackingField: {fileID: 361816992828208385, guid: 30350e87381f3d94ab1d980b10b58185, type: 3}
+  <CurrentPlayer>k__BackingField: 0
