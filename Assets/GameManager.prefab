@@ -49,3 +49,4 @@ MonoBehaviour:
   <Spacing>k__BackingField: 1
   <TilePrefab>k__BackingField: {fileID: 361816992828208385, guid: 30350e87381f3d94ab1d980b10b58185, type: 3}
   <CurrentPlayer>k__BackingField: 0
+  <TestCube>k__BackingField: {fileID: 6143304785607707668, guid: 68e3fabeb0beb6747b1c03cdde82e65e, type: 3}
