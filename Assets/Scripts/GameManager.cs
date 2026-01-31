@@ -1,6 +1,7 @@
 using System;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+
 public class GameManager : MonoBehaviour
 {
     public Tile[,] Tiles
@@ -120,13 +121,11 @@ public class GameManager : MonoBehaviour
         // Check if there are spaces for future moves - if not, run draw method and return, else continue
         if (NoSpacesAvailable())
         {
-            Debug.Log("No Space Available.");
             Draw();
             return;
         }
 
         // Switch the current player to the opponent.
-        Debug.Log("Future play possible, switching current player.");
         SwitchPlayer();
 
         // Start the turn of the new current player.
@@ -142,7 +141,7 @@ public class GameManager : MonoBehaviour
 
     public bool CheckWin()
     {
-        return LoopRowsOrCollumns(Tiles.GetLength(0), Tiles.GetLength(1), true) || LoopRowsOrCollumns(Tiles.GetLength(1), Tiles.GetLength(0), false);
+        return CheckLines(Tiles.GetLength(0), Tiles.GetLength(1), true) || CheckLines(Tiles.GetLength(0), Tiles.GetLength(1), false) || CheckDiagonal(Tiles.GetLength(0), Tiles.GetLength(1), true) || CheckDiagonal(Tiles.GetLength(0), Tiles.GetLength(1), false);
     }
 
     public void Win(User winner)
@@ -159,8 +158,6 @@ public class GameManager : MonoBehaviour
 
     public bool NoSpacesAvailable()
     {
-        Debug.Log("No win found, checking for spaces.");
-
         bool isNoSpaceAvailable = true;
 
         foreach (Tile tile in Tiles)
@@ -192,67 +189,65 @@ public class GameManager : MonoBehaviour
         CurrentPlayer = newPlayer;
     }
 
-    public bool LoopRowsOrCollumns(int firstDimensionLength, int secondDimensionLength, bool isColumns)
+    public bool CheckLines(int firstDimensionLength, int secondDimensionLength, bool isColumns)
     {
         User previousTileOwner = User.None;
-        int playerCount = 0;
-        int aICount = 0;
+        int winnerCount = 0;
 
         int i;
         int j;
+
+        List<Tile> winningTiles = new List<Tile>();
 
         // Checking lines.
         for (i = 0; DimensionCheckOne(); i++)
         {
             for (j = 0; DimensionCheckTwo(); j++)
             {
-                // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
-                if (GetTileIndex(isColumns).TileOwner == User.Player)
-                {
-                    // If the player count in the row is zero and the previous tile is unowned, then add to count.
-                    // Also allow count if the player count is greater then zero and the previous tile owner is also the player.
-                    if ((playerCount == 0 && previousTileOwner == User.None) || (playerCount > 0 && previousTileOwner == User.Player))
-                    {
-                        playerCount++;
-                        previousTileOwner = User.Player;
-                    }
+                Tile currentTile = GetTileIndex(isColumns);
 
-                }
-                else if (GetTileIndex(isColumns).TileOwner == User.AI)
+                // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
+                if (currentTile.TileOwner != User.None)
                 {
-                    // If the AI count in the row is zero and the previous tile is unowned, then add to count.
-                    // Also allow count if the AI count is greater then zero and the previous tile owner is also the AI.
-                    if ((aICount == 0 && previousTileOwner == User.None) || (aICount > 0 && previousTileOwner == User.AI))
+                    if ((winnerCount == 0 && previousTileOwner == User.None) || winnerCount > 0 && previousTileOwner == currentTile.TileOwner)
                     {
-                        aICount++;
-                        previousTileOwner = User.AI;
+                        winnerCount++;
+                        previousTileOwner = currentTile.TileOwner;
+                        winningTiles.Add(currentTile);
+                    }
+                    else
+                    {
+                        winnerCount = 0;
+                        previousTileOwner = currentTile.TileOwner;
+                        winningTiles.Clear();
                     }
                 }
-                else if (GetTileIndex(isColumns).TileOwner == User.None)
+                else
                 {
-                    // On an unowned tile, any row being made is broken therefore reset the player / AI counts.
-                    playerCount = 0;
-                    aICount = 0;
+                    // On an unowned tile, any row being made is broken therefore reset the winner counts.
+                    winnerCount = 0;
                     previousTileOwner = User.None;
+                    winningTiles.Clear();
                     continue;
                 }
 
                 // If a win is found, return the method as true.
-                if (playerCount == 3)
+                if (winnerCount == 3)
                 {
-                    return true;
-                }
-                else if (aICount == 3)
-                {
+                    foreach(Tile tile in winningTiles)
+                    {
+                        tile.GetComponentInChildren<UnityEngine.UI.Image>().color = Color.green;
+                    }
+
                     return true;
                 }
             }
 
             // Resetting the count in the line if no win is found.
             Debug.Log("Line complete");
-            playerCount = 0;
-            aICount = 0;
+            winnerCount = 0;
             previousTileOwner = User.None;
+            winningTiles.Clear();
         }
 
         return false;
@@ -272,6 +267,11 @@ public class GameManager : MonoBehaviour
         {
             return isColumns ? Tiles[i, j] : Tiles[j, i];
         }
+    }
+
+    bool CheckDiagonal(int firstDimensionLength, int secondDimensionLength, bool startZeroZero)
+    {
+        return false;
     }
 }
 
