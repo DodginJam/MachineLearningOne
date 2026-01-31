@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         // Loop through the valid tiles that the AI can make a play on.
         List<Tile> validTiles = new List<Tile>();
 
-        for (int i = 0; i < Tiles.GetLongLength(0); i++)
+        for (int i = 0; i < Tiles.GetLength(0); i++)
         {
             for (int j = 0; j < Tiles.GetLength(1); j++)
             {
@@ -142,131 +142,7 @@ public class GameManager : MonoBehaviour
 
     public bool CheckWin()
     {
-        bool winFound = false;
-
-        User previousTileOwner = User.None;
-        int playerCount = 0;
-        int aICount = 0;
-
-        // Checking columns.
-        for (int i = 0; i < Tiles.GetLength(0); i++)
-        {
-            for (int j = 0; j < Tiles.GetLength(1); j++)
-            {
-                // Loop over the columns and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
-                if (Tiles[i, j].TileOwner == User.Player)
-                {
-                    // If the player count in the row is zero and the previous tile is unowned, then add to count.
-                    // Also allow count if the player count is greater then zero and the previous tile owner is also the player.
-                    if ((playerCount == 0 && previousTileOwner == User.None) || (playerCount > 0 && previousTileOwner == User.Player))
-                    {
-                        playerCount++;
-                        previousTileOwner = User.Player;
-                    }
-
-                }
-                else if (Tiles[i, j].TileOwner == User.AI)
-                {
-                    // If the AI count in the row is zero and the previous tile is unowned, then add to count.
-                    // Also allow count if the AI count is greater then zero and the previous tile owner is also the AI.
-                    if ((aICount == 0 && previousTileOwner == User.None) || (aICount > 0 && previousTileOwner == User.AI))
-                    {
-                        aICount++;
-                        previousTileOwner = User.AI;
-                    }
-                }
-                else if (Tiles[i, j].TileOwner == User.None)
-                {
-                    // On an unowned tile, any row being made is broken therefore reset the player / AI counts.
-                    playerCount = 0;
-                    aICount = 0;
-                    previousTileOwner = User.None;
-                    continue;
-                }
-
-                // Break the inner loop if a win is found.
-                if (playerCount == 3)
-                {
-                    winFound = true;
-                    break;
-                }
-                else if (aICount == 3)
-                {
-                    winFound = true;
-                    break;
-                }
-
-                // Break the outer loop if win is found.
-                if (winFound)
-                {
-                    break;
-                }
-            }
-
-            Debug.Log("Column complete");
-            // Resetting the count in the Column line.
-            playerCount = 0;
-            aICount = 0;
-            previousTileOwner = User.None;
-        }
-
-        // Checking rows.
-        for (int i = 0; i < Tiles.GetLength(1); i++)
-        {
-            for (int j = 0; j < Tiles.GetLength(0); j++)
-            {
-                // Loop over the rows and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
-                if (Tiles[j, i].TileOwner == User.Player)
-                {
-                    if ((playerCount == 0 && previousTileOwner == User.None) || (playerCount > 0 && previousTileOwner == User.Player))
-                    {
-                        playerCount++;
-                        previousTileOwner = User.Player;
-                    }
-
-                }
-                else if (Tiles[j, i].TileOwner == User.AI)
-                {
-                    if ((aICount == 0 && previousTileOwner == User.None) || (aICount > 0 && previousTileOwner == User.AI))
-                    {
-                        aICount++;
-                        previousTileOwner = User.AI;
-                    }
-                }
-                else if (Tiles[j, i].TileOwner == User.None)
-                {
-                    playerCount = 0;
-                    aICount = 0;
-                    previousTileOwner = User.None;
-                }
-
-                // Break the inner loop if a win is found.
-                if (playerCount == 3)
-                {
-                    winFound = true;
-                    break;
-                }
-                else if (aICount == 3)
-                {
-                    winFound = true;
-                    break;
-                }
-
-                // Break the outer loop if win is found.
-                if (winFound)
-                {
-                    break;
-                }
-            }
-
-            Debug.Log("Row complete");
-            // Resetting the count in the Row line.
-            playerCount = 0;
-            aICount = 0;
-            previousTileOwner = User.None;
-        }
-
-        return winFound;
+        return LoopRowsOrCollumns(Tiles.GetLength(0), Tiles.GetLength(1), true) || LoopRowsOrCollumns(Tiles.GetLength(1), Tiles.GetLength(0), false);
     }
 
     public void Win(User winner)
@@ -314,6 +190,88 @@ public class GameManager : MonoBehaviour
     public void SwitchPlayer(User newPlayer)
     {
         CurrentPlayer = newPlayer;
+    }
+
+    public bool LoopRowsOrCollumns(int firstDimensionLength, int secondDimensionLength, bool isColumns)
+    {
+        User previousTileOwner = User.None;
+        int playerCount = 0;
+        int aICount = 0;
+
+        int i;
+        int j;
+
+        // Checking lines.
+        for (i = 0; DimensionCheckOne(); i++)
+        {
+            for (j = 0; DimensionCheckTwo(); j++)
+            {
+                // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
+                if (GetTileIndex(isColumns).TileOwner == User.Player)
+                {
+                    // If the player count in the row is zero and the previous tile is unowned, then add to count.
+                    // Also allow count if the player count is greater then zero and the previous tile owner is also the player.
+                    if ((playerCount == 0 && previousTileOwner == User.None) || (playerCount > 0 && previousTileOwner == User.Player))
+                    {
+                        playerCount++;
+                        previousTileOwner = User.Player;
+                    }
+
+                }
+                else if (GetTileIndex(isColumns).TileOwner == User.AI)
+                {
+                    // If the AI count in the row is zero and the previous tile is unowned, then add to count.
+                    // Also allow count if the AI count is greater then zero and the previous tile owner is also the AI.
+                    if ((aICount == 0 && previousTileOwner == User.None) || (aICount > 0 && previousTileOwner == User.AI))
+                    {
+                        aICount++;
+                        previousTileOwner = User.AI;
+                    }
+                }
+                else if (GetTileIndex(isColumns).TileOwner == User.None)
+                {
+                    // On an unowned tile, any row being made is broken therefore reset the player / AI counts.
+                    playerCount = 0;
+                    aICount = 0;
+                    previousTileOwner = User.None;
+                    continue;
+                }
+
+                // If a win is found, return the method as true.
+                if (playerCount == 3)
+                {
+                    return true;
+                }
+                else if (aICount == 3)
+                {
+                    return true;
+                }
+            }
+
+            // Resetting the count in the line if no win is found.
+            Debug.Log("Line complete");
+            playerCount = 0;
+            aICount = 0;
+            previousTileOwner = User.None;
+        }
+
+        return false;
+
+        // In method methods.
+        bool DimensionCheckOne()
+        {
+            return isColumns ? i < firstDimensionLength : i < secondDimensionLength;
+        }
+
+        bool DimensionCheckTwo()
+        {
+            return isColumns ? j < secondDimensionLength : j < firstDimensionLength;
+        }
+
+        Tile GetTileIndex(bool isColumns)
+        {
+            return isColumns ? Tiles[i, j] : Tiles[j, i];
+        }
     }
 }
 
