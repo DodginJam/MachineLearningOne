@@ -41,6 +41,7 @@ public class Tile : MonoBehaviour
     {
         TileOwner = currentPlayer;
         TextDisplay.text = TilesText[currentPlayer];
+        GetComponentInChildren<UnityEngine.UI.Image>().color = currentPlayer == User.Player ? Color.blue : Color.black;
     }
 
     void PlayerClickEvent()
@@ -58,6 +59,11 @@ public class Tile : MonoBehaviour
         SetTileOwner(User.AI);
 
         OnClick?.Invoke();
+    }
+
+    public void UpdateTextDisplay(string newText)
+    {
+        TextDisplay.text = newText;
     }
 
     static Dictionary<User, string> TilesText = new Dictionary<User, string>();

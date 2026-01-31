@@ -44,9 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d4df08d824ae7b45b97e3fda21bd353, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Width>k__BackingField: 3
-  <Length>k__BackingField: 3
-  <Spacing>k__BackingField: 1
+  <Length>k__BackingField: 4
+  <Width>k__BackingField: 5
+  <Spacing>k__BackingField: 1.05
   <TilePrefab>k__BackingField: {fileID: 361816992828208385, guid: 30350e87381f3d94ab1d980b10b58185, type: 3}
-  <CurrentPlayer>k__BackingField: 0
-  <TestCube>k__BackingField: {fileID: 6143304785607707668, guid: 68e3fabeb0beb6747b1c03cdde82e65e, type: 3}

@@ -47,7 +47,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Button>k__BackingField: {fileID: 4659244665357603266}
   <TextDisplay>k__BackingField: {fileID: 3344223498678083386}
-  <TileOwner>k__BackingField: 0
 --- !u!1 &1763783433231075331
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,8 +241,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 1
-  m_fontSizeBase: 1
+  m_fontSize: 0.33
+  m_fontSizeBase: 0.33
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0
