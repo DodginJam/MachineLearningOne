@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
@@ -98,6 +99,7 @@ public class GameManager : MonoBehaviour
                     tiles[j, i] = tile;
                     TilesInteractionaStatusEvent += tile.SetInteractableState;
                     tile.OnClick += EndTurn;
+                    tile.UpdateTextDisplay($"{i}, {j}");
                 }
                 else
                 {
@@ -193,11 +195,10 @@ public class GameManager : MonoBehaviour
     {
         User previousTileOwner = User.None;
         int winnerCount = 0;
+        List<Tile> winningTiles = new List<Tile>();
 
         int i;
         int j;
-
-        List<Tile> winningTiles = new List<Tile>();
 
         // Checking lines.
         for (i = 0; DimensionCheckOne(); i++)
@@ -209,22 +210,24 @@ public class GameManager : MonoBehaviour
                 // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
                 if (currentTile.TileOwner != User.None)
                 {
+                    // If the winning counter is zero and no previous owner was found, start the count. Also increment counter if the counter is greater then zero and the current tile is same owner as last tile.
                     if ((winnerCount == 0 && previousTileOwner == User.None) || winnerCount > 0 && previousTileOwner == currentTile.TileOwner)
                     {
                         winnerCount++;
-                        previousTileOwner = currentTile.TileOwner;
                         winningTiles.Add(currentTile);
                     }
+                    // If the previous tile was owned by a different owner the the current, reset the winner counter.
                     else
                     {
                         winnerCount = 0;
-                        previousTileOwner = currentTile.TileOwner;
                         winningTiles.Clear();
                     }
+
+                    previousTileOwner = currentTile.TileOwner;
                 }
                 else
                 {
-                    // On an unowned tile, any row being made is broken therefore reset the winner counts.
+                    // On an unowned tile, any winning tile collection being made is broken therefore reset the winner counts.
                     winnerCount = 0;
                     previousTileOwner = User.None;
                     winningTiles.Clear();
@@ -243,13 +246,14 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            // Resetting the count in the line if no win is found.
+            // Resetting the winning counter if no win is found within the current line before moving on to the next.
             Debug.Log("Line complete");
             winnerCount = 0;
             previousTileOwner = User.None;
             winningTiles.Clear();
         }
 
+        //  False is returned when no winner is found during the nested for loops.
         return false;
 
         // In method methods.
