@@ -559,11 +559,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7211146820970559779, guid: f01493fb4bcec87459902f273d111c1c, type: 3}
       propertyPath: <Width>k__BackingField
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7211146820970559779, guid: f01493fb4bcec87459902f273d111c1c, type: 3}
       propertyPath: <Length>k__BackingField
-      value: 7
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
