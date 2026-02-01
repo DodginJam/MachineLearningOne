@@ -210,17 +210,18 @@ public class GameManager : MonoBehaviour
                 // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
                 if (currentTile.TileOwner != User.None)
                 {
-                    // If the winning counter is zero and no previous owner was found, start the count. Also increment counter if the counter is greater then zero and the current tile is same owner as last tile.
-                    if ((winnerCount == 0 && previousTileOwner == User.None) || winnerCount > 0 && previousTileOwner == currentTile.TileOwner)
+                    // If the winning counter is zero, start the count. Also increment counter if the counter is greater then zero and the current tile is same owner as last tile.
+                    if (winnerCount == 0 || winnerCount > 0 && previousTileOwner == currentTile.TileOwner)
                     {
                         winnerCount++;
                         winningTiles.Add(currentTile);
                     }
-                    // If the previous tile was owned by a different owner the the current, reset the winner counter.
+                    // If the previous tile was owned by a different owner the the current, reset the winner to one for the new owners streak.
                     else
                     {
-                        winnerCount = 0;
                         winningTiles.Clear();
+                        winnerCount = 1;
+                        winningTiles.Add(currentTile);
                     }
 
                     previousTileOwner = currentTile.TileOwner;
