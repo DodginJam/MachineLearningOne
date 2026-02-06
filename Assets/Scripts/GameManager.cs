@@ -143,7 +143,7 @@ public class GameManager : MonoBehaviour
 
     public bool CheckWin()
     {
-        return CheckLines(Tiles.GetLength(0), Tiles.GetLength(1), true) || CheckLines(Tiles.GetLength(0), Tiles.GetLength(1), false) || CheckDiagonal(Tiles.GetLength(0), Tiles.GetLength(1), true) || CheckDiagonal(Tiles.GetLength(0), Tiles.GetLength(1), false);
+        return CheckLines(Tiles.GetLength(0), Tiles.GetLength(1), true) || CheckLines(Tiles.GetLength(0), Tiles.GetLength(1), false) || CheckDiagonal(0, 0, false) || CheckDiagonal(0, 0, true);
     }
 
     public void Win(User winner)
@@ -207,6 +207,8 @@ public class GameManager : MonoBehaviour
             {
                 Tile currentTile = GetTileIndex(isColumns);
 
+                // currentTile.GetComponentInChildren<UnityEngine.UI.Image>().color = i == 0 ? Color.magenta : j == 0 ? Color.gray : Color.white;
+
                 // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
                 if (currentTile.TileOwner != User.None)
                 {
@@ -248,7 +250,6 @@ public class GameManager : MonoBehaviour
             }
 
             // Resetting the winning counter if no win is found within the current line before moving on to the next.
-            Debug.Log("Line complete");
             winnerCount = 0;
             previousTileOwner = User.None;
             winningTiles.Clear();
@@ -274,86 +275,77 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    bool CheckDiagonal(int firstDimensionLength, int secondDimensionLength, bool startZeroZero)
+    bool CheckDiagonal(int startPointIndexOne, int startPointIndexTwo, bool fliped)
     {
-        User previousTileOwner = User.None;
-        int winnerCount = 0;
         List<Tile> winningTiles = new List<Tile>();
 
-        int i;
-        int j;
-
-        // Checking lines.
-        for (i = 0; DimensionCheckOne(); i++)
+        for (int sum = 0; sum < Width + Length - 1; sum++)
         {
-            for (j = 0; DimensionCheckTwo(); j++)
-            {
-                Tile currentTile = GetTileIndex(startZeroZero);
+            User previousTileOwner = User.None;
+            int winnerCount = 0;
+            winningTiles.Clear();
 
-                // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
-                if (currentTile.TileOwner != User.None)
+            for (int x = 0; x < Width; x++)
+            {
+                int y = sum - x;
+
+                if (y >= 0 && y < Length)
                 {
-                    // If the winning counter is zero and no previous owner was found, start the count. Also increment counter if the counter is greater then zero and the current tile is same owner as last tile.
-                    if ((winnerCount == 0 && previousTileOwner == User.None) || winnerCount > 0 && previousTileOwner == currentTile.TileOwner)
+                    int newX = x;
+
+                    if (fliped)
                     {
-                        winnerCount++;
-                        winningTiles.Add(currentTile);
+                        newX = (Width - 1) - x;
                     }
-                    // If the previous tile was owned by a different owner the the current, reset the winner counter.
+
+                    Tile currentTile = Tiles[newX, y];
+
+                    // currentTile.GetComponentInChildren<UnityEngine.UI.Image>().color = i == 0 ? Color.magenta : j == 0 ? Color.gray : Color.white;
+
+                    // Loop over the line and check for player, AI or unowned tiles and track ownership in orders of 3 in a row to find a win.
+                    if (currentTile.TileOwner != User.None)
+                    {
+                        // If the winning counter is zero, start the count. Also increment counter if the counter is greater then zero and the current tile is same owner as last tile.
+                        if (winnerCount == 0 || winnerCount > 0 && previousTileOwner == currentTile.TileOwner)
+                        {
+                            winnerCount++;
+                            winningTiles.Add(currentTile);
+                        }
+                        // If the previous tile was owned by a different owner the the current, reset the winner to one for the new owners streak.
+                        else
+                        {
+                            winningTiles.Clear();
+                            winnerCount = 1;
+                            winningTiles.Add(currentTile);
+                        }
+
+                        previousTileOwner = currentTile.TileOwner;
+                    }
                     else
                     {
+                        // On an unowned tile, any winning tile collection being made is broken therefore reset the winner counts.
                         winnerCount = 0;
+                        previousTileOwner = User.None;
                         winningTiles.Clear();
+                        continue;
                     }
 
-                    previousTileOwner = currentTile.TileOwner;
-                }
-                else
-                {
-                    // On an unowned tile, any winning tile collection being made is broken therefore reset the winner counts.
-                    winnerCount = 0;
-                    previousTileOwner = User.None;
-                    winningTiles.Clear();
-                    continue;
-                }
-
-                // If a win is found, return the method as true.
-                if (winnerCount == 3)
-                {
-                    foreach (Tile tile in winningTiles)
+                    // If a win is found, return the method as true.
+                    if (winnerCount == 3)
                     {
-                        tile.GetComponentInChildren<UnityEngine.UI.Image>().color = Color.green;
+                        foreach (Tile tile in winningTiles)
+                        {
+                            tile.GetComponentInChildren<UnityEngine.UI.Image>().color = Color.green;
+                        }
+
+                        return true;
                     }
 
-                    return true;
                 }
             }
-
-            // Resetting the winning counter if no win is found within the current line before moving on to the next.
-            Debug.Log("Line complete");
-            winnerCount = 0;
-            previousTileOwner = User.None;
-            winningTiles.Clear();
         }
 
-        //  False is returned when no winner is found during the nested for loops.
         return false;
-
-        // In method methods.
-        bool DimensionCheckOne()
-        {
-            return startZeroZero ? i < firstDimensionLength : i < secondDimensionLength;
-        }
-
-        bool DimensionCheckTwo()
-        {
-            return startZeroZero ? j < secondDimensionLength : j < firstDimensionLength;
-        }
-
-        Tile GetTileIndex(bool startZeroZero)
-        {
-            return startZeroZero ? Tiles[i, j] : Tiles[j, i];
-        }
     }
 }
 
