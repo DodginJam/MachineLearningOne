@@ -60,26 +60,75 @@ public class GameManager : MonoBehaviour
     {
         TilesInteractionaStatusEvent?.Invoke(false);
 
+        /*
         // Loop through the valid tiles that the AI can make a play on.
-        List<Tile> validTiles = new List<Tile>();
+                List<Tile> validTiles = new List<Tile>();
 
-        for (int i = 0; i < Tiles.GetLength(0); i++)
-        {
-            for (int j = 0; j < Tiles.GetLength(1); j++)
-            {
-                Tile currentTile = Tiles[i, j];
-
-                if (currentTile.TileOwner == User.None)
+                for (int i = 0; i < Tiles.GetLength(0); i++)
                 {
-                    validTiles.Add(currentTile);
+                    for (int j = 0; j < Tiles.GetLength(1); j++)
+                    {
+                        Tile currentTile = Tiles[i, j];
+
+                        if (currentTile.TileOwner == User.None)
+                        {
+                            validTiles.Add(currentTile);
+                        }
+                    }
+                }
+
+                int randomValidTileIndex = UnityEngine.Random.Range(0, validTiles.Count);
+
+
+                // End the turn after the AI makes a move.
+                validTiles[randomValidTileIndex].AIClickEvent();
+        */
+
+        // Get the best move that the AI agent can take to try and win the game.
+        Vector2Int bestMove = GetBestMove();
+        Tiles[bestMove.x, bestMove.y].AIClickEvent();
+    }
+
+    Vector2Int GetBestMove()
+    {
+        User[,] boardState = GetBoardState();
+
+        int bestScore = int.MinValue;
+        Vector2Int bestMove = new Vector2Int(-1, -1);
+
+        // Loop through all the tiles and test the scoring produced on unowned tile.
+        for (int i = 0; i < boardState.GetLength(0); i++)
+        {
+            for (int j = 0; j < boardState.GetLength(1); j++)
+            {
+                if (boardState[i, j] == User.None)
+                {
+
                 }
             }
         }
 
-        int randomValidTileIndex = UnityEngine.Random.Range(0, validTiles.Count);
+        bestMove = new Vector2Int(0, 0);
+        return bestMove;
+    }
 
-        // End the turn after the AI makes a move.
-        validTiles[randomValidTileIndex].AIClickEvent();
+    /// <summary>
+    /// Return a copy of the board state as flagged by the ownership of the tiles.
+    /// </summary>
+    /// <returns></returns>
+    User[,] GetBoardState()
+    {
+        User[,] boardState = new User[Tiles.GetLength(0), Tiles.GetLength(1)];
+
+        for (int i = 0; i < boardState.GetLength(0); i++)
+        {
+            for (int j = 0; j < boardState.GetLength(1); j++)
+            {
+                boardState[i, j] = Tiles[i, j].TileOwner;
+            }
+        }
+
+        return boardState;
     }
 
     private Tile[,] GenerateTiles(int width = 3, int length = 3, float spacing = 1)
