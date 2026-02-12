@@ -86,30 +86,79 @@ public class GameManager : MonoBehaviour
 
         // Get the best move that the AI agent can take to try and win the game.
         Vector2Int bestMove = GetBestMove();
-        Tiles[bestMove.x, bestMove.y].AIClickEvent();
+
+        if (bestMove.x >= 0 && bestMove.y >= 0)
+        {
+            Tiles[bestMove.x, bestMove.y].AIClickEvent();
+        }
+        else
+        {
+            Debug.LogError("The local variable titled best move has an invalid coordinate.");
+        }
     }
 
     Vector2Int GetBestMove()
     {
+        // Generate a copy of the board as an 2D array of the user owners.
         User[,] boardState = GetBoardState();
 
         int bestScore = int.MinValue;
         Vector2Int bestMove = new Vector2Int(-1, -1);
 
-        // Loop through all the tiles and test the scoring produced on unowned tile.
+        // Loop through all the unowned tiles and test the scoring produced on it.
         for (int i = 0; i < boardState.GetLength(0); i++)
         {
             for (int j = 0; j < boardState.GetLength(1); j++)
             {
+                // Check unowned tiles only.
                 if (boardState[i, j] == User.None)
                 {
+                    boardState[i, j] = User.AI;
 
+                    int score = Minimax(boardState);
+
+                    boardState[i, j] = User.None;
+
+                    // If the score is the new best, assign it as the new best score and store the indices.
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestMove = new Vector2Int (i, j);
+                    }
                 }
             }
         }
 
-        bestMove = new Vector2Int(0, 0);
         return bestMove;
+    }
+
+    int Minimax(User[,] boardState)
+    {
+        int result = EvaluateBoard(boardState);
+
+        if (result != 0)
+        {
+            return result;
+        }
+
+        if (IsBoardFull(boardState))
+        {
+            return 0;
+        }
+    }
+
+    bool IsBoardFull(User[,] board)
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Length; y++)
+            {
+                if (board[x, y] == User.None)
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
