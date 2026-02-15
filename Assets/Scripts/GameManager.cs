@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -37,7 +38,9 @@ public class GameManager : MonoBehaviour
     public int DepthLimit_AI
     { get; private set; } = 4;
 
-    private void Start()
+    public event Action<bool> UpdateWaitingText;
+
+    public void StartGame()
     {
         // Create the tiles in a grid.
         Tiles = GenerateTiles(Width, Length, Spacing);
@@ -55,18 +58,24 @@ public class GameManager : MonoBehaviour
         }
         else if (CurrentPlayer == User.AI)
         {
-            AITurn();
+            StartCoroutine(AITurn());
         }
     }
 
     public void PlayerTurnStart()
     {
+        UpdateWaitingText?.Invoke(false);
+
         TilesInteractionaStatusEvent?.Invoke(true);
     }
 
-    public void AITurn()
+    public IEnumerator AITurn()
     {
         TilesInteractionaStatusEvent?.Invoke(false);
+
+        UpdateWaitingText?.Invoke(true);
+
+        yield return new WaitForSeconds(0.5f);
 
         /*
         // Loop through the valid tiles that the AI can make a play on.
@@ -93,7 +102,6 @@ public class GameManager : MonoBehaviour
         */
 
         // Get the best move that the AI agent can take to try and win the game.
-        Debug.Log("AI thinking...");
         Vector2Int bestMove = GetBestMove();
 
         if (bestMove.x >= 0 && bestMove.y >= 0)
@@ -355,7 +363,7 @@ public class GameManager : MonoBehaviour
         }
         else if (CurrentPlayer == User.AI)
         {
-            AITurn();
+            StartCoroutine(AITurn());
         }
     }
 
