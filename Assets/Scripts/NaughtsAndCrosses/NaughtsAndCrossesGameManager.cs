@@ -2,9 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class GameManager : MonoBehaviour
+public class NaughtsAndCrossesGameManager : MonoBehaviour
 {
     public Tile[,] Tiles
     { get; set; }

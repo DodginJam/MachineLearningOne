@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,7 +14,7 @@ public class UIManager : MonoBehaviour
     { get; private set; }
 
     [field: SerializeField]
-    public GameManager GameManager 
+    public NaughtsAndCrossesGameManager GameManager 
     { get; private set; }
 
     [field: SerializeField]
