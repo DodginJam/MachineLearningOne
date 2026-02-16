@@ -5,10 +5,7 @@ public class AgentInput : MonoBehaviour
     public float ForwardInput
     { get; private set; }
 
-    public float LeftInput
-    { get; private set; }
-
-    public float RightInput
+    public float RotateInput
     { get; private set; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -27,12 +24,10 @@ public class AgentInput : MonoBehaviour
     /// Update the normalised input values for the input
     /// </summary>
     /// <param name="forwardInput"></param>
-    /// <param name="leftInput"></param>
-    /// <param name="rightInput"></param>
-    public void UpdateInput(float forwardInput, float leftInput, float rightInput)
+    /// <param name="rotateInput"></param>
+    public void UpdateInput(float forwardInput, float rotateInput)
     {
-        ForwardInput = Mathf.Clamp(forwardInput, 0.0f, 1.0f);
-        LeftInput = Mathf.Clamp(leftInput, 0.0f, 1.0f);
-        RightInput = Mathf.Clamp(rightInput, 0.0f, 1.0f);
+        ForwardInput = Mathf.Clamp(forwardInput, -1.0f, 1.0f);
+        RotateInput = Mathf.Clamp(rotateInput, -1.0f, 1.0f);
     }
 }
