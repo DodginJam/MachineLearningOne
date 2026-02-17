@@ -143,4 +143,6 @@ MonoBehaviour:
   <AvoidLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 64
-  <AvoidenceDistance>k__BackingField: 10
+  <LongRangeAvoidenceDistance>k__BackingField: 10
+  <MediumRangeAvoidenceDistance>k__BackingField: 5
+  <ShortRangeAvoidenceDistance>k__BackingField: 1

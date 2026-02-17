@@ -22,8 +22,16 @@ public class AgentController : MonoBehaviour
     { get; private set; }
 
     [field: SerializeField, Min(1f)]
-    public float AvoidenceDistance
+    public float LongRangeAvoidenceDistance
     { get; private set; } = 10.0f;
+
+    [field: SerializeField, Min(1f)]
+    public float MediumRangeAvoidenceDistance
+    { get; private set; } = 5.0f;
+
+    [field: SerializeField, Min(1f)]
+    public float ShortRangeAvoidenceDistance
+    { get; private set; } = 1.0f;
 
 
     private void Awake()
@@ -59,9 +67,11 @@ public class AgentController : MonoBehaviour
 
         Debug.DrawLine(transform.position, capusleBottom, Color.red);
         Debug.DrawLine(transform.position, capusleTop, Color.blue);
-        Debug.DrawLine(transform.position, transform.position + (transform.forward * AvoidenceDistance), Color.blue);
-        
-        if (Physics.CapsuleCast(capusleBottom, capusleTop, Controller.radius, transform.forward, out RaycastHit hitinfo, AvoidenceDistance, AvoidLayer))
+        Debug.DrawLine(transform.position, transform.position + (transform.forward * LongRangeAvoidenceDistance), Color.blue);
+        Debug.DrawLine(transform.position, transform.position + (transform.forward * MediumRangeAvoidenceDistance), Color.yellow);
+        Debug.DrawLine(transform.position, transform.position + (transform.forward * ShortRangeAvoidenceDistance), Color.red);
+
+        if (Physics.CapsuleCast(capusleBottom, capusleTop, Controller.radius, transform.forward, out RaycastHit hitinfo, LongRangeAvoidenceDistance, AvoidLayer))
         {
             Debug.Log("Collision Imminent");
         }
