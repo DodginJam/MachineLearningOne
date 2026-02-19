@@ -66,7 +66,8 @@ public class AgentController : MonoBehaviour
         // The dot product of the agents faceing direction and the direction to the goal.
         float facingGoalDotProduct = FacingGoal();
 
-
+        // Apply steering values to the character so that it attempts to face the goal direction.
+        newInput.y = facingGoalDotProduct > 0.001f ? 1 : facingGoalDotProduct < -0.001f ? -1 : 0;
 
         // On an incoming collision turn until the collision is avoided.
         if (CastCapsule(out float distanceToCollision))
@@ -87,13 +88,8 @@ public class AgentController : MonoBehaviour
                 newInput.y = facingGoalDotProduct > 0.001f ? 1f : facingGoalDotProduct < -0.001f ? -1f : 0;
             }*/
         }
-        else
-        {
-            // Apply steering values to the character so that it attempts to face the goal direction.
-            newInput.y = facingGoalDotProduct > 0.001f ? 1 : facingGoalDotProduct < -0.001f ? -1 : 0;
-        }
 
-            AgentInput.UpdateInput(newInput);
+        AgentInput.UpdateInput(newInput);
 
         // The movement and rotation inputs applied to the character controller.
         transform.Rotate(Vector3.up, AgentInput.Input.y * RotatiomSpeedMax * Time.deltaTime);
