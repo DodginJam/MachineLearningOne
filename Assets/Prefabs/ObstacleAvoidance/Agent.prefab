@@ -147,9 +147,7 @@ MonoBehaviour:
   <GoalLayer>k__BackingField:
     serializedVersion: 2
     m_Bits: 128
-  <LongRangeAvoidenceDistance>k__BackingField: 10
-  <MediumRangeAvoidenceDistance>k__BackingField: 5
-  <ShortRangeAvoidenceDistance>k__BackingField: 1
+  <AvoidenceDistance>k__BackingField: 5
 --- !u!1 &3857908367431189382
 GameObject:
   m_ObjectHideFlags: 0

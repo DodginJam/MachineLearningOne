@@ -28,16 +28,8 @@ public class AgentController : MonoBehaviour
     { get; private set; }
 
     [field: SerializeField, Min(1f)]
-    public float LongRangeAvoidenceDistance
+    public float AvoidenceDistance
     { get; private set; } = 10.0f;
-
-    [field: SerializeField, Min(1f)]
-    public float MediumRangeAvoidenceDistance
-    { get; private set; } = 5.0f;
-
-    [field: SerializeField, Min(1f)]
-    public float ShortRangeAvoidenceDistance
-    { get; private set; } = 1.0f;
 
     public Vector3 GoalPosition
     { get; private set; }
@@ -64,29 +56,20 @@ public class AgentController : MonoBehaviour
         Vector2 newInput = new Vector2(AgentInput.Input.x, AgentInput.Input.y);
 
         // The dot product of the agents faceing direction and the direction to the goal.
-        float facingGoalDotProduct = FacingGoal();
-
-        // Apply steering values to the character so that it attempts to face the goal direction.
-        newInput.y = facingGoalDotProduct > 0.001f ? 1 : facingGoalDotProduct < -0.001f ? -1 : 0;
+        float facingGoalDotProduct = CharacterFacingPosition(transform, GoalPosition);
 
         // On an incoming collision turn until the collision is avoided.
-        if (CastCapsule(out float distanceToCollision))
+        if (CastCapsule(out RaycastHit hitInfo))
         {
-            newInput.y = Mathf.Sign(facingGoalDotProduct);
+            float obstacleDotProduct = CharacterFacingPosition(transform, hitInfo.point);
 
-/*
-            if (distanceToCollision < LongRangeAvoidenceDistance && distanceToCollision > MediumRangeAvoidenceDistance)
-            {
-                newInput.y = facingGoalDotProduct > 0.001f ? 0.33f : facingGoalDotProduct < -0.001f ? -0.33f : 0;
-            }
-            else if (distanceToCollision < MediumRangeAvoidenceDistance && distanceToCollision > ShortRangeAvoidenceDistance)
-            {
-                newInput.y = facingGoalDotProduct > 0.001f ? 0.66f : facingGoalDotProduct < -0.001f ? -0.66f : 0;
-            }
-            else if (distanceToCollision < ShortRangeAvoidenceDistance)
-            {
-                newInput.y = facingGoalDotProduct > 0.001f ? 1f : facingGoalDotProduct < -0.001f ? -1f : 0;
-            }*/
+            newInput.y = obstacleDotProduct > 0 ? -1 : 1;
+
+        }
+        else
+        {
+            // Apply steering values to the character so that it attempts to face the goal direction.
+            newInput.y = facingGoalDotProduct > 0.001f ? 1 : facingGoalDotProduct < -0.001f ? -1 : 0;
         }
 
         AgentInput.UpdateInput(newInput);
@@ -96,24 +79,20 @@ public class AgentController : MonoBehaviour
         Controller.SimpleMove(AgentInput.Input.x * MovementSpeedMax * transform.forward);
     }
 
-    bool CastCapsule(out float distanceToCollision)
+    bool CastCapsule(out RaycastHit capsuleHitInfo)
     {
         Vector3 capusleBottom = transform.position + (Vector3.down * (Controller.height / 2));
         Vector3 capusleTop = transform.position + (Vector3.up * (Controller.height / 2));
 
-/*
-        Debug.DrawLine(transform.position, transform.position + (transform.forward * LongRangeAvoidenceDistance), Color.blue);
-        Debug.DrawLine(transform.position, transform.position + (transform.forward * MediumRangeAvoidenceDistance), Color.yellow);
-        Debug.DrawLine(transform.position, transform.position + (transform.forward * ShortRangeAvoidenceDistance), Color.red);
-*/
+        Debug.DrawLine(transform.position, transform.position + (transform.forward * AvoidenceDistance), Color.blue);
 
-        if (Physics.CapsuleCast(capusleBottom, capusleTop, Controller.radius + 0.1f, transform.forward, out RaycastHit hitinfo, LongRangeAvoidenceDistance, AvoidLayer))
+        if (Physics.CapsuleCast(capusleBottom, capusleTop, Controller.radius + 0.1f, transform.forward, out RaycastHit hitinfo, AvoidenceDistance, AvoidLayer))
         {
-            distanceToCollision = hitinfo.distance;
+            capsuleHitInfo = hitinfo;
             return true;
         }
 
-        distanceToCollision = -1f;
+        capsuleHitInfo = new RaycastHit();
         return false;
     }
 
@@ -144,14 +123,9 @@ public class AgentController : MonoBehaviour
         return nearestPosition;  
     }
 
-    float FacingGoal()
+    float CharacterFacingPosition(Transform character, Vector3 positionToCheck)
     {
-        Debug.DrawLine(transform.position, transform.position + (transform.forward * 10), Color.blue);
-        Debug.DrawLine(transform.position, GoalPosition, Color.blue);
-
-        float dotProduct = Vector3.Dot(transform.right.normalized, (GoalPosition - transform.position).normalized);
-
-        Debug.Log(dotProduct);
+        float dotProduct = Vector3.Dot(character.right.normalized, (positionToCheck - character.position).normalized);
 
         return dotProduct;
     }
